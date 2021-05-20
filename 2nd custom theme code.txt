@@ -1,0 +1,525 @@
+<?php get_header(); ?>		<>header jog
+<?php get_footer(); ?>		<>footer jog
+<?php wp_head();  ?>		<>end head tag up type
+<?php wp_footer();  ?>		<>end body tag up type
+<?php body_class();  ?>		<>body start tag under type
+<?php language_attributes(); ?>		=	language er jonno;
+<?php bloginfo ('charset');?>		=	utf er jonno eita likhte hobe charset er koteshon er vitore;
+
+<?php echo get_bloginfo('name'); ?>  |  <?php echo get_bloginfo('description'); ?>		<>site title | site tagline
+<?php echo get_bloginfo('template_url');?>	<>full link
+
+__________________________________________________________________________________________________________________________________________________
+****DOCUMENTETION--> functions.php
+
+wp_enqueue_script();
+wp_enqueue_style();
+
+
+// defined function
+function profotech_solutions_scripts(){
+     // CSS Files
+     wp_enqueue_style('main_style', get_stylesheet_uri());
+  wp_enqueue_style('style_file',get_template_directory_uri().'/style/css/style.css');
+  // javascripts
+   wp_enqueue_script('jquery-1.11.3.min.js', get_template_directory_uri() . '/style/js/jquery-1.11.3.min.js', array(), '1.1', true);
+  
+   // fontawesome add  just this cod emplyment
+   wp_enqueue_script('fontawesome','https://kit.fontawesome.com/1807844b84.js', array(), '1.1', true);
+
+}
+
+// attach with action hook
+add_action("wp_enqueue_scripts","profotech_solutions_scripts");
+  
+
+__________________________________________________________________________________________________________________________________________________
+			page.php
+		**********************
+****DOCUMENTETION--> this bottom all codes type page.php
+    <?php
+
+	if (have_posts()) { // check page contains any post data or not
+
+	while (have_posts()) { // repeat over each post of the page
+    	the_post();
+    ?>
+
+    <div>
+        <h1> <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a> </h1>
+        <?php the_content(); ?>
+    </div>
+
+
+    <!---echo get_the_permalink(); // get the link of page
+    echo get_the_title();  // get the title of page
+    echo get_the_content(); // get the content of page
+    --->
+    <?php 
+	}
+     }
+
+    ?>
+__________________________________________________________________________________________________________________________________________________
+			menu daynamic
+		******************************
+****DOCUMENTETION--> functions.php
+
+ // menu rejister functions.php file e likhte hobe eita
+   register_nav_menus( array(
+      "primary" => "top menu",
+      "footer"  => "bottom menu",
+   ) );
+
+			normal menu 
+		******************************
+****DOCUMENTETION--> nav & ulunder
+
+<?php
+wp_nav_menu(array(
+	'location'	=>	'primary',
+	'container'	=>	'',
+	'menu_class'	=>	'ul er class',
+
+));
+?>
+
+			complex menu like bootstrap 
+		********************************************
+
+      problame hole 21/22 no video
+****DOCUMENTETION--> nav & ul under       shohoj upay holo li ta copy kore jei khane jei ta dorkar sheta diye ddea
+
+<?php
+	$locationDetails = get_nav_menu_locations();
+	$menuId = $locationDetails['primary'];
+	$pryMenuItem = wp_get_nav_menu_items($menuId);
+?>
+
+<ul class="navbar-nav mr-auto (ul er class)">
+                           
+<?php 
+	foreach($pryMenuItem as $key=>$value){
+?>
+                           
+	<li class="nav-item"><a class="nav-link" href="<?php echo $value->url; ?>"><?php echo $value->title; ?></a></li>
+
+<?php 
+	}_
+?>
+
+</ul>
+_________________________________________________________________________________________________________________________________________________
+			Custom Logo Upload to wordpress theme part=8
+		******************************************************************
+****DOCUMENTETION--> functions.php
+
+   function themename_custom_logo_setup() {
+      $defaults = array(
+         'height'       => 50,
+         'width'        => 100,
+      );
+      add_theme_support( 'custom-logo',$defaults );
+   }
+   add_action( 'after_setup_theme','themename_custom_logo_setup' );
+
+
+
+****DOCUMENTETION-->
+1\ logo under//
+2\ jodi logo css er dara background e deya thake tahole = logo inspact kore design ta niye upore style open kore design raikha image url thika    path ta niya baki shob nicher moto korte hobe & src er vitorer php cod ta url er vitore dite hobe..
+****DOCUMENTETION-->
+
+<?php
+    $img = get_bloginfo('template_url').'/images/logo.png'; //this is image location
+    $custom_logo_id = get_theme_mod('custom_logo');
+    $logo = wp_get_attachment_image_src($custom_logo_id , 'full');
+    if(has_custom_logo() ){
+      $img = esc_url($logo[0]);
+   }
+?>
+<div class="logo"><a href="index.html"> <img src="<?php echo $img; ?>"> </a></div>
+__________________________________________________________________________________________________________________________________________________
+			      Create Post and Display on theme page  part= 9 
+		******************************************************************
+****DOCUMENTETION--> any page _ jei khane dynamic post korte can full code past- ul ami just example disi caile dite o parben abar na o dite parben
+
+
+<!---  post type area -->
+
+<?php $wpb_all_query = new WP_Query (array ('post_type'=>'post', 'post_status'=>'publish') ); ?>
+<?php if( $wpb_all_query -> have_posts() ): ?>
+
+<ul>
+
+	<?php 
+		while($wpb_all_query->have_posts() ) : $wpb_all_query -> the_post();
+	?>
+
+		<h3><a href="<?php the_permalink(); ?>"> <?php the_title(); ?> </a></h3>
+		<?php the_content(); ?>
+
+	<?php 
+		endwhile;
+	?>
+
+</ul>
+
+<?php else : ?>
+<p> <?php _e('sory , no have post')	?> </p>
+<?php endif; ?>
+<!---  post type area -->
+__________________________________________________________________________________________________________________________________________________
+			      Register Custom Post Type in wordpress  part= 10 
+		******************************************************************
+****DOCUMENTETION--> eita hobe functions page e / register custom post type thes under code type functions.php / ke post korse ba kokhon post korse time ei shob deya jabe //ei shob dite chaile video dekhte hobe 10 part
+
+//register custom post type 
+  function register_my_custom_post(){
+     register_post_type ('custom_projects', array(
+        'labels'=>array(
+           'name'=>('our project'),
+           'singular_name' =>('custom_projects'),
+        ),
+        'public'=>true,
+        "show_in_nav_menus"=>true,
+        'has_archive'=>false,
+        'supports'=>array('title','editor','excerpt','author','comments')
+     ) );
+  }
+
+  add_action("init","register_my_custom_post");
+//register custom post type
+
+****DOCUMENTETION-->eita hobe jei khane post show koraben/ eita same creat post er moto just post type ta change korte hobe
+
+<!---  post type area -->
+
+<?php $wpb_all_query = new WP_Query (array ('post_type'=>'custom_projects', 'post_status'=>'publish') ); ?>
+<?php if( $wpb_all_query -> have_posts() ): ?>
+
+	<?php 
+		while($wpb_all_query->have_posts() ) : $wpb_all_query -> the_post();
+	?>
+
+		<?php the_post_thumbnail(); ?>
+		<h3><a href="<?php the_permalink(); ?>"> <?php the_title(); ?> </a></h3>
+		<?php the_content(); ?>
+
+	<?php 
+		endwhile;
+	?>
+
+<?php else : ?>
+<p> <?php _e('sory , no have post')	?> </p>
+<?php endif; ?>
+<!---  post type area -->
+__________________________________________________________________________________________________________________________________________________
+			          Register Dynamic Sidebar in wordpress part= 11  /
+                   Display Dynamic Sidebar to Wordpress part= 12
+                   (Part 26) Complete details of Sidebar
+	   	   ******************************************************************
+****DOCUMENTETION--> register function  ti likhte hobe functions.php te / importent id ta change korte hobe & sidebar icche moto banano jabe/
+
+ //register sidebar
+function profotech_register_sidebar(){
+
+   register_sidebar(array(
+      'name' => __ ('primary sidebar','theme_name'),
+      'id' => 'sidebar-1',
+      'before_widget' => '<aside id="%1$s" cass="widget %2$s">',
+      'before_title' => '<i class="widget_title">',
+      'after_title' => '</i>',
+   ));
+
+   register_sidebar(array(
+      'name' => __ ('primary sidebar 2','theme_name'),
+      'id' => 'sidebar-2',
+      'before_widget' => '<aside id="%1$s" cass="widget %2$s">',
+      'before_title' => '<h1 class="widget_title">',
+      'after_title' => '</h1>',
+   ));
+}
+   add_action("widgets_init","profotech_register_sidebar");
+
+
+****DOCUMENTETION--> / ei necher lekhata likhte hobe sidebar.php  file e O he ekti sidebar file nite hote/
+****DOCUMENTETION--> ebong widget e giye ei side bar er vitore widget drag and drop korle kaj korbe
+
+<?php if( is_active_sidebar( 'sidebar-1' ) ) : ?>
+	<?php dynamic_sidebar( 'sidebar-1' ); ?>
+<?php endif; ?>
+
+*****documenttion ---> necher code ti likhte hobe jei khane show korte cai oi khane likhte hobe,
+	<?php get_sidebar() ;?>
+__________________________________________________________________________________________________________________________________________________
+			      Featured Image and Post Formats Support  part= 15
+		******************************************************************
+****DOCUMENTETION-->eita hobe functions.php file e/ small-size ei value ti hobe ..the_post_thumbnail("small-size") jeikhane image show korate hobe oi khane
+
+function image_register(){
+        add_theme_support("post-thumbnails");
+        add_image_size("small-size",100,80,true)/** small-size ei value ti hobe ..the_post_thumbnail("small-size") jeikhane image show korate hobe oi khane */;
+        add_image_size("big-size",400,200,true);
+        // post formats
+        add_theme_support("post-formats",array("aside","gallery","link")); //eita post format 
+    }
+    add_action("after_setup_theme","image_register");
+__________________________________________________________________________________________________________________________________________________
+                              			     Post Meta data(date, author, category)  part= 16
+		                              ******************************************************************
+document *****-> eita shudhu time er jonno /**https://wordpress.org/support/article/formatting-date-and-time/       formatt change korte cile ager link ti format er jonno the time er vitore single kotetion diye likhte hobe*****/
+document ***-> | ehake bola hoy pipe line/ ei papline er pore jei code ase oita ar ekta code 
+document ****-> eikhane 3 ta cod ase 1/ date  2/ author   3/ categories
+
+<h4> <?php the_time('F j, Y g:i a') ?> | <a href="<?php echo get_author_posts_url( get_the_author_meta('id') ); ?>"> <?php the_author(); ?> </a> | <?php 
+						
+						$categories = get_the_category();
+						$separator = ", ";
+						$catoptions = '';
+						foreach($categories as $category){
+							$catoptions .="<a href='".get_category_link($category->term_id)."'/>".$category->cat_name."</a>".$separator;
+						}
+
+						echo trim($catoptions,$separator);
+							
+					?> </h4>
+__________________________________________________________________________________________________________________________________________________
+                                             Complete Detail of Wp 'content.php' page  = part 17
+		                              ******************************************************************
+documenttion *****> first post while and endwhile er majhkhane jei content thakbe dynamic othoba static oi content gulo ke nite hobe ( template-parts new file er vitore content.php ei file e content guli rakhte hobe) er pore while er vitore likhte hobe
+
+//while loop under
+get_template_part("template-parts/content",get_post_format() );
+
+
+documenttion *****> er pore 3 ta file nite hobe template parts folder er vitore (content-aside.php) (content-link.php) (content-gallery.php) and ei file er vitore content.php file er code gulo likhte hobe shob file 
+************************************************************
+documenttion *** > ei ta nicher post er  jonno document>> jodi post e kono image na thake tahole default image deyar jonno ei vabe image er code bad diye if else er estetment boshate hobe 
+
+               <?php 
+						if( has_post_thumbnail() ){
+							the_post_thumbnail("small-size"); 
+
+						}else{
+					?>
+						<img src="<?php echo get_template_directory_uri().'/images/loading.gif' ?>" style="wight:100px; height:80px;">
+					<?php
+						};
+					?>
+____________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+                                             Role of single.php, singular.php  = part 18
+		                              ******************************************************************
+documenttion *****> single.php          Wordpress er vitore jei post korar option thake ba post kora zay oi post ke single kore dekhar jonno ei page nite hoy// and oi post ke design dite hobe single.php ei file//
+documenttion *****> single-custom.php   ar jodi register custom post hoy tahole file er nam likhte hoy single-custom.php (mane custom er jagay likhte hobe register post type e ja likha thakbe)     //
+document ******> majhe majhe kaj kore na tokhon wordpress er permalink  change kore dile thik hoye jabe and abar caile change kore post name deya jabe
+__________________________________________________________________________________________________________________________________________________
+                                             page.php, page-{page-id}.php = part 19
+		                              ******************************************************************
+document *****> page.php   menu button click korle jei page e jay oi page er name page.php 
+document *****> page-slug.php    slug mane menu te jei name oi tai jemon home (( page-home.php )) ek ekta page er jonno design korarr jonno jokhon jei page shei name likhte hobe
+document *****> r ek vabe kora jay template name diye  lagle dekhe niben
+            eita saaame parrt  18 er moto
+__________________________________________________________________________________________________________________________________________________
+                                            front-page.php vs home.php vs index.php part 20
+		                              ******************************************************************
+document *****>      front-page.php    eita shobar theke beshi ogradhikar pay eita file prothome show korbe 
+document *****>      home.php          jodi front-page.php na thake tahole eita ashbe front beshi prareti pay
+document *****>      index.php
+__________________________________________________________________________________________________________________________________________________
+___________________________________________________part 21 / 22___________________________________________________
+documenttion *****>        nav menu this tutrial but aita agei lekha ase upore
+______________________________________________________________________________________________
+ ___________________________________________ archive.php /      part 23 / 24___________________________________________________
+document *****>      jeta ami korte pari nai karon problame hoise bair korte pari nai tai jokhon lagbe tokhon dekha zabe
+document *****>      archive page er vitore category , author, date etc: show kore kintu eigula shob alada alada kora zay
+document *****>       zodi kokhon lage tokhon dekha zabe,
+__________________________________________________________________________________________________________________________________________________                          
+                                             from scratch (Part 25)
+                                    =======================================
+documenttion****>       search form er code shob likhte hobe jei khane search form niben.
+documenttion****>   
+    				
+            <form method="get" action=" <?php  home_url('/');  ?> ">
+					<label for="search for">search for</label>
+					<input type="text" placeholder="search for here" name="s" />
+					<button type="submit">search </button>
+				</form>
+__________________________________________________________________________________________________________________________________________________
+                                       (Part 27) Register Theme Customizer Panel Settings
+                                       (Part 28) Color Picker and Image Uploader Settings
+                              https://developer.wordpress.org/reference/hooks/customize_register/
+                           ========================================================================
+documenttion*****> ei ta onek dorkari ekta jinish (theme option) user frindly korte onek shohoj hoy. full course korte hobe deya ase youtube e.
+documenttion*****> function file e function gulo likhte hobe end jei khane show korabo oi khane o likhte hobe ekti code.
+documenttion*****> ei rokom  onek gulo theme option ase jemon (Text Input,Radio Input,Checkbox,Select Box,Image Upload,File Upload,Color Picker,Page Dropdown,Category Dropdown,etc)  (Detail in this case) https://developer.wordpress.org/reference/hooks/customize_register/
+
+documenttion code 1****> add action er upore bracet er  upore theme option/nicher code gulo boshbe, details website e deya ase.
+function name == ekta  dilei hobe,eita hobe add action huck e,
+add section == ekta dilei hobe, and eita hobe add_control er  section e. code 2/3 er vitore section ase.
+
+documenttion code 2****> add_setting ekta dilei hobe , and eita hobe add_control er settings e boshbe ,, r section ta hobe shob shomy eki section = add_action, 
+                
+documenttion code 3****> sem 2 er moto. and ei code 1//2/3/4/5 shob gulo hobe functions.php
+
+documenttion code 4****> add_setting e name ekta dilei hobe . default e kono image dite caile default e deya ase oi vabe likhte hobe, r na caile kisui likhte hobe na. r add_control e section name , r settings e name ta boshate hobe.
+
+documenttion code 5****> add_setting e name ekta dilei hobe, color default dite chaile color cod default e boshalei hobe. r add_control e section name , r settings e setting er name ta boshate hobe.
+
+
+documention****> and ei code 1//2/3/4/5 shob gulo hobe functions.php
+                                                         code 1
+                                                ========================
+    //theme customize pnale
+    function themename_customize_register($wp_customize){
+        $wp_customize->add_section('theme_customize_pnale_register_name', array(
+            'title'    => 'footer',
+            'description' => 'footer section edit',
+            'priority' => 50,
+        ));
+      
+
+
+      }
+      add_action('customize_register', 'themename_customize_register');
+
+                                                          code 2
+                                                =========================
+         // =============================
+        //  = Text Input                =
+        //  =============================
+        $wp_customize->add_setting('theme_customize_setting', array(
+            'default'        => ' &copy; 2017 All right reserved. Designed by',
+            'capability'     => 'edit_theme_options',
+            'type'           => 'option',
+      
+        ));
+      
+        $wp_customize->add_control('theme_customize_control', array(
+            'label'      => 'copy right box',
+            'section'    => 'theme_customize_pnale_register_name',
+            'settings'   => 'theme_customize_setting',
+        ));
+
+
+                                                           code 3
+                                                ===========================
+         //  =============================
+         //  = Page Dropdown             =
+         //  =============================
+         $wp_customize->add_setting('copyright_pag_link_setting', array(
+            'capability'     => 'edit_theme_options',
+            'type'           => 'option',
+      
+         ));
+      
+         $wp_customize->add_control('copyright_pag_link_control', array(
+            'label'      => 'copy right link pag',
+            'section'    => 'theme_customize_pnale_register_name',
+            'type'    => 'dropdown-pages',
+            'settings'   => 'copyright_pag_link_setting',
+         ));
+
+
+                                                         code 4
+                                                ===========================
+    //  =============================
+    //  = Image Upload              =
+    //  =============================
+    $wp_customize->add_setting('sk_theme_image', array(
+        'default'           => get_bloginfo('template_url')."/images/category4.png" ,
+        'capability'        => 'edit_theme_options',
+        'type'           => 'option',
+  
+    ));
+  
+    $wp_customize->add_control( new WP_Customize_Image_Control($wp_customize, 'image_upload_test', array(
+        'label'    => 'Upload Image',
+        'section'  => 'theme_customize_pnale_register_name',
+        'settings' => 'sk_theme_image',
+    )));
+
+                                                         code 5
+                                                ===========================
+                                                
+      //  =============================
+      //  = Color Picker              =
+      //  =============================
+      $wp_customize->add_setting('sk_theme_colorpicker', array(
+         'default'           => '#000',
+         'sanitize_callback' => 'sanitize_hex_color',
+         'capability'        => 'edit_theme_options',
+         'type'           => 'option',
+
+      ));
+
+      $wp_customize->add_control( new WP_Customize_Color_Control($wp_customize, 'link_color', array(
+         'label'    => 'Chose Color',
+         'section'  => 'theme_customize_pnale_register_name',
+         'settings' => 'sk_theme_colorpicker',
+      )));
+
+
+
+
+
+
+documenttion **** > ei nicher code gulo hobe jei khane show koraite cai sheikhane , but ei gulaa diye beshir vag shomoy header r footer er kaj kora hoy,
+documenttion code 2 *****> ei ta je kono lekha change korte chaile ei code ti likhlei hobe. r he get_option('setting') er vitor jei lekhati ase oi ta holo setting.
+
+<?php echo get_option('theme_customize_setting') ?>
+
+
+documenttion code 3 ****> ei ta hobe code 3 er page er khetre, same uporerr code er moto code ta ene ekta var e nite hobe. then porerr code ta href er vitore likhte hobe
+                           <?php
+                                $page_id = get_option('copyright_pag_link_setting');
+                            ?>
+<?php echo get_the_permalink($page_id);?>
+
+
+documention code 4****> jei jagay image user frindly korte chai oi khane img tag er vitore src er vitore likhte hoy ei code ti style o deya zete pare.
+                        <?php echo get_option('sk_theme_image'); ?>
+
+
+documention code 5****> jar color change korte cai shei jagay ei php code ti likhte hoy, jodi background hoy tahole background er vitore color er jagay likhte hobe.
+                     <?php echo get_option('sk_theme_colorpicker') ?>;
+
+_____________________________________________________________________________________________________________________________
+                                          404.php     page 
+                              ======================================
+
+documention*********** ei ta holo kono erorr show korarr jonno design korlei hobe erorr hole ei rokom hobe
+documention************** r jodi back koraite cchai tahole a diye link baniye er por href er vitore ei cod ti likhte hobe
+                                    <h6><a href="<?php echo home_url('/') ?>"> Go Back</a></h6>
+
+
+
+
+
+
+
+
+
+
+
+
+
+_____________________________________________________________________________________________________________________________
+
+
+
+
+developer.wordpress.org/reference/functions/get_bloginfo/
+
+			course link
+		_____________________________
+https://youtu.be/d8HMBG4bfsI
+____________________________________________________________________________________________________________________________
+
+
+
+
+
+
+
+#c6610f
